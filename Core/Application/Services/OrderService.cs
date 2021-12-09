@@ -23,12 +23,13 @@ namespace Application.Services
             _cacheService = cacheService;
         }
 
+        [CacheRemoveAspect(pattern:"IOrderService.ListAll")]
         public Task<IResponse<int>> Create(CreateOrderDto orderModel)
         {
             return _orderRepository.CreateOrder(orderModel);
         }
 
-        //[CacheAspect]
+        [CacheAspect]
         public IResponse<List<OrderDto>> ListAllOrder()
         {
             var orderListResponse = _orderRepository.GetAll();

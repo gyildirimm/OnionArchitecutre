@@ -3,6 +3,7 @@ using Application.Core.CrossCuttingConcerns.Redis;
 using Application.Interfaces;
 using Application.Services;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace Application.DependencyResolver
 {
@@ -11,10 +12,13 @@ namespace Application.DependencyResolver
         public static void AddServices(this IServiceCollection services)
         {
             services.AddTransient<IOrderService, OrderService>();
+
             services.AddStackExchangeRedisCache(o => 
             {
                 o.Configuration = "localhost:6379";
             });
+
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost:6379"));
 
             services.AddScoped<ICacheService, RedisCacheService>();
         }

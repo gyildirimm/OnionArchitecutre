@@ -1,5 +1,6 @@
 ﻿using Application.Core.CrossCuttingConcerns;
 using Application.Core.Utilities.Interceptors;
+using Application.Core.Utilities.IoC;
 using Castle.DynamicProxy;
 
 namespace Application.Core.Aspects.Autofac
@@ -7,17 +8,17 @@ namespace Application.Core.Aspects.Autofac
     public class CacheRemoveAspect : MethodInterception
     {
         private string _pattern;
-        private ICacheService _cacheManager;
+        private ICacheService _cacheService;
 
-        public CacheRemoveAspect(ICacheService cacheService,string pattern)
+        public CacheRemoveAspect(string pattern)
         {
             _pattern = pattern;
-            _cacheManager = cacheService;
+            _cacheService = (ICacheService)ServiceTool.ServiceProvider.GetService(typeof(ICacheService));
         }
 
         protected override void OnSuccess(IInvocation invocation)
         {
-            _cacheManager.RemoveByPattern(_pattern);
+            _cacheService.RemoveByPattern(_pattern);
         }
     }
 }

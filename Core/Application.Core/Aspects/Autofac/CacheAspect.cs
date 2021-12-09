@@ -18,12 +18,10 @@ namespace Application.Core.Aspects.Autofac
     {
         private int _duration;
         private ICacheService _cacheService;
-        private Type _responseType;
 
         public CacheAspect(int duration = 600)
         {
             _duration = duration;
-            //_responseType = responseType;
             _cacheService = (ICacheService)ServiceTool.ServiceProvider.GetService(typeof(ICacheService));
         }
 
@@ -35,9 +33,7 @@ namespace Application.Core.Aspects.Autofac
 
             #region closeTry
 
-            Type x = ((TypeInfo)invocation.Method.ReturnType).DeclaredFields.ElementAt(0).FieldType;
-
-            //invocation.ReturnValue = Newtonsoft.Json.JsonConvert.DeserializeObject(_cacheService.Get(key), x);
+            
             #endregion
             var isAwaitable = invocation.Method.ReturnType.GetMethod(nameof(Task.GetAwaiter)) != null;
 
@@ -45,15 +41,14 @@ namespace Application.Core.Aspects.Autofac
             {
                 if (!isAwaitable)
                 {
-                    invocation.ReturnValue = _cacheService.GetObject(key);
+                    invocation.ReturnValue = _cacheService.Get(key);
                 }
                 else
                 {
-                    //invocation.ReturnValue = _cacheService.GetObject(key);
-                    //var data = CastTool.DynamicCast(_cacheService.GetObject(key), _responseType);
-                    var data = CastTool.dynamicCast.MakeGenericMethod(new[] { x }).Invoke(null, new[] { _cacheService.GetObject(key) });
+                    Type x = ((TypeInfo)invocation.Method.ReturnType).DeclaredFields.ElementAt(0).FieldType;
+                    var data = CastTool.dynamicCast.MakeGenericMethod(new[] { x }).Invoke(null, new[] { _cacheService.Get(key) });
+
                     invocation.ReturnValue = data;
-                    //invocation.ReturnValue = Task.FromResult((Application.Core.Wrappers.IResponse<List<OrderDto>>)Convert.ChangeType(_cacheService.GetObject(key), _responseType));
                 }
                 return;
             }
