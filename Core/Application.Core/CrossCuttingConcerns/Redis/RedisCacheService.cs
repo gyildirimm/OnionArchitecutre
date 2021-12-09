@@ -42,9 +42,10 @@ namespace Application.Core.CrossCuttingConcerns.Redis
 
         public T Get<T>(string key)
         {
-            byte[] redisData = _redisCache.Get(key);
+            string redisData = _redisCache.GetString(key);
 
-            return (T)FromByteArray(redisData);
+
+            return EntityDumperHelper.LoadBack<T>(redisData);
         }
 
         public object Get(string key, bool fromString = false)
